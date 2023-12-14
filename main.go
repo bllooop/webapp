@@ -1,10 +1,10 @@
 package main
 
 import (
-	"html/template"
+	"flag"
 	"log"
 	"net/http"
-	"strconv"
+	"os"
 )
 
 type Movies struct {
@@ -14,50 +14,31 @@ type Movies struct {
 	Description string
 }
 
-func printHtml(w http.ResponseWriter, filename string, data interface{}) {
-	t, err := template.ParseFiles(filename)
-	if err != nil {
-		http.Error(w, "500 Server error", 500)
-		return
-	}
-	if err := t.Execute(w, data); err != nil {
-		http.Error(w, "500 Server error", 500)
-		return
-	}
+type application struct {
+	ErrorLog *log.Logger
+	InfoLog  *log.Logger
 }
-func home(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Page not found"))
-		return
-	}
-	movie := Movies{"Example", "2023-1-1", 5, "Example movie"}
-	//w.Write([]byte(jsonMovie))
-	printHtml(w, "./templates/main_page.html", movie)
-}
-func secondPage(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
-	if err != nil && id < 1 {
-		w.Write([]byte("Movie not found"))
-		return
-	}
-	w.Write([]byte("Детали фильма"))
-}
-func createMovie(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.Header().Set("Allow", http.MethodPost)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("GET method not allowed"))
-		return
-	}
-	w.Write([]byte("Добавление нового фильма"))
-}
+
 func main() {
+	addr := flag.String("addr", ":4000", "Сетевой адрес HTTP")
+	flag.Parse()
+	infolog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	errolog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app := &application{
+		ErrorLog: errolog,
+		InfoLog:  infolog,
+	}
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", home)
-	mux.HandleFunc("/movie", secondPage)
-	mux.HandleFunc("/movie/createMovie", createMovie)
-	log.Println("Запуск веб-сервиса")
-	err := http.ListenAndServe(":4000", mux)
-	log.Fatal(err)
+	mux.HandleFunc("/", app.home)
+	mux.HandleFunc("/movie", app.secondPage)
+	mux.HandleFunc("/movie/createMovie", app.createMovie)
+
+	serv := &http.Server{
+		Addr:     *addr,
+		ErrorLog: errolog,
+		Handler:  mux,
+	}
+	infolog.Printf("Запуск веб-сервиса на %s", *addr)
+	err := serv.ListenAndServe()
+	errolog.Fatal(err)
 }
