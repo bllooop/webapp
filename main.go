@@ -28,15 +28,11 @@ func main() {
 		ErrorLog: errolog,
 		InfoLog:  infolog,
 	}
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", app.home)
-	mux.HandleFunc("/movie", app.secondPage)
-	mux.HandleFunc("/movie/createMovie", app.createMovie)
 
 	serv := &http.Server{
 		Addr:     *addr,
 		ErrorLog: errolog,
-		Handler:  mux,
+		Handler:  app.routes(),
 	}
 	infolog.Printf("Запуск веб-сервиса на %s", *addr)
 	err := serv.ListenAndServe()

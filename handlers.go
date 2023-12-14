@@ -9,17 +9,17 @@ import (
 func (app *application) printHtml(w http.ResponseWriter, filename string, data interface{}) {
 	t, err := template.ParseFiles(filename)
 	if err != nil {
-		app.ErrorLog.Println(err.Error())
+		app.servErr(w, err)
 		return
 	}
 	if err := t.Execute(w, data); err != nil {
-		app.ErrorLog.Println(err.Error())
+		app.servErr(w, err)
 		return
 	}
 }
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		http.NotFound(w, r)
+		app.notFound(w)
 		return
 	}
 	movie := Movies{"Example", "2023-1-1", 5, "Example movie"}
@@ -36,8 +36,7 @@ func (app *application) secondPage(w http.ResponseWriter, r *http.Request) {
 func (app *application) createMovie(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("GET method not allowed"))
+		app.clientErr(w, http.StatusMethodNotAllowed)
 		return
 	}
 	w.Write([]byte("Добавление нового фильма"))
