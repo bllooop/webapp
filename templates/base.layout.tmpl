@@ -1,0 +1,23 @@
+{{define "base"}}
+<!doctype html>
+<html lang = 'en'>
+<head>
+<title>{{template "title" .}} - Movies</title>
+<link rel = 'stylesheet' href = '/static/main.css'>
+<link rel='shortcut icon' href='static/movie-icon.webp' type = 'image/x-icon'>
+<link rel ='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,70'>
+</head>
+<body>
+<header>
+<h1><a href = '/'>Movies</a></h1>
+</header>
+<nav>
+<a href = '/'>Главная страница</a>
+</nav>
+<main>
+{{template "main" .}}
+</main>
+    <script src="/static/js/main.js" type="text/javascript"></script>
+</body>
+</html>
+{{end}}

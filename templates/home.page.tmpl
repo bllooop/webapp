@@ -1,0 +1,23 @@
+{{template "base". }}
+{{define "title"}}Главная страница фильмов {{end}}
+{{define "main"}}
+<h2>Список фильмов</h2>
+{{if .Movies}}
+<table>
+<tr>
+<th>Название</th>
+<th>Дата выпуска</th>
+<th>ID</th>
+</tr>
+{{range .Movies}}
+<tr>
+<td><a href='/movie?id={{.ID}}'>{{.Name}}</a></td>
+<td>{{.ReleaseDate}}</td>
+<td>№{{.ID}}</td>
+</tr>
+{{end}}
+</table>
+{{else}}
+<p>Пусто</p>
+{{end}}
+{{end}}

@@ -1,0 +1,12 @@
+{{template "base" .}}
+{{define "title"}} Идентификатор фильма{{.Movie.ID}}{{end}}
+{{define "main"}}
+{{with .Movie}}
+<div class = 'movie'>
+<strong>{{.Name}}</strong>
+<p>Рейтинг: {{.Rating}}</p>
+<pre><code>{{.Description}}</code></pre>
+<time>Дата выпуска: {{.ReleaseDate}}</time>
+</div>
+{{end}}
+{{end}}

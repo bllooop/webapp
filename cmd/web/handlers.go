@@ -10,8 +10,8 @@ import (
 	"go.com/movies/cmd/web/pkg/models"
 )
 
-func (app *application) printHtml(w http.ResponseWriter, filename string, data interface{}) {
-	t, err := template.ParseFiles(filename)
+func (app *application) printHtml(w http.ResponseWriter, filename []string, data interface{}) {
+	t, err := template.ParseFiles(filename...)
 	if err != nil {
 		app.servErr(w, err)
 		return
@@ -31,11 +31,12 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		app.servErr(w, err)
 		return
 	}
-	for _, v := range k {
-		fmt.Fprintf(w, "%v\n", v)
+	data := &movieData{Movies: k}
+	files := []string{
+		"./templates/home.page.tmpl",
+		"./templates/base.layout.tmpl",
 	}
-	//movie := Movies{"Example", "2023-1-1", 5, "Example movie"}
-	//app.printHtml(w, "./templates/main_page.html", movie)
+	app.printHtml(w, files, data)
 }
 func (app *application) secondPage(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
@@ -52,7 +53,12 @@ func (app *application) secondPage(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	fmt.Fprintf(w, "%v", k)
+	data := &movieData{Movie: k}
+	files := []string{
+		"./templates/show.page.tmpl",
+		"./templates/base.layout.tmpl",
+	}
+	app.printHtml(w, files, data)
 }
 func (app *application) createMovie(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {

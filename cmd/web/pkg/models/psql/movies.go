@@ -13,7 +13,8 @@ type MovieModel struct {
 
 func (m *MovieModel) Insert(name, releaseDate, rating, description string) (int, error) {
 	var id int
-	statement := `INSERT INTO movies (name, releaseDate, rating, description) VALUES (?,?,?,?) RETURNING id`
+	statement := `INSERT INTO movies (name, releaseDate, rating, description) 
+	VALUES ($1,$2,$3,$4) RETURNING id`
 	err := m.DB.QueryRow(statement, name, releaseDate, rating, description).Scan(&id)
 	if err != nil {
 		return 0, nil
@@ -22,7 +23,8 @@ func (m *MovieModel) Insert(name, releaseDate, rating, description string) (int,
 }
 
 func (m *MovieModel) Get(id int) (*models.Movie, error) {
-	statement := `SELECT FROM name, releaseDate, rating, description FROM movies WHERE id = ?`
+	statement := `SELECT name, releaseDate, rating, description
+	 FROM movies WHERE id = $1`
 	res := m.DB.QueryRow(statement, id)
 	k := &models.Movie{}
 	err := res.Scan(&k.Name, &k.ReleaseDate, &k.Rating, &k.Description)
@@ -36,7 +38,8 @@ func (m *MovieModel) Get(id int) (*models.Movie, error) {
 	return k, nil
 }
 func (m *MovieModel) LastTwenty() ([]*models.Movie, error) {
-	statement := `SELECT FROM id, name, releaseDate, rating, description FROM movies ORDER BY id DESC LIMIT 20`
+	statement := `SELECT id, name, releaseDate, rating, description 
+	FROM movies ORDER BY id DESC LIMIT 20`
 	result, err := m.DB.Query(statement)
 	if err != nil {
 		return nil, err
