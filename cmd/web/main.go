@@ -26,7 +26,8 @@ type application struct {
 
 func main() {
 	addr := flag.String("addr", ":4000", "Сетевой адрес HTTP")
-	databas := flag.String("databas", "postgres://person:12345@localhost:5432/movies", "Подключение к PSQL")
+	password := os.Getenv("DB_PASSWORD")
+	databas := flag.String("databas", "postgres://db:"+password+"@localhost:5432/movies", "Подключение к PSQL")
 	flag.Parse()
 	infolog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorlog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
